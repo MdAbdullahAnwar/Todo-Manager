@@ -5,6 +5,7 @@ import Footer from "./components/Layout/Footer";
 import LoginSignup from "./components/Auth/LoginSignup";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import Home from "./pages/Home";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
       <Router>
         <div className="flex flex-col min-h-screen">
           <Header />
-          <main className="flex-grow bg-gray-100 p-6">
+          <main className="flex-grow bg-gray-100">
             <Routes>
               {/* Public Route */}
               <Route path="/auth" element={<LoginSignup />} />
@@ -22,7 +23,7 @@ function App() {
                 path="/"
                 element={
                   <ProtectedRoute>
-                    <h2>Welcome Home!</h2>
+                    <Home />
                   </ProtectedRoute>
                 }
               />
