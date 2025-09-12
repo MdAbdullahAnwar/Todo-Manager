@@ -6,7 +6,6 @@ function About() {
     <section className="bg-gradient-to-r from-[#f0faff] via-[#e6f2ff] to-[#e0f7fa] text-gray-900 py-32 px-6">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
 
-        {/* Left Content */}
         <div className="text-center md:text-left max-w-lg">
           <h2 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
             About <span className="text-teal-600">Todo Manager</span>
@@ -21,7 +20,6 @@ function About() {
           </p>
         </div>
 
-        {/* Right Features / Highlights */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full md:w-1/2">
           <div className="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-lg text-center hover:scale-105 transition">
             <FaBullseye className="text-teal-500 text-4xl mx-auto mb-3" />
