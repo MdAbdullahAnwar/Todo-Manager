@@ -6,6 +6,7 @@ import LoginSignup from "./components/Auth/LoginSignup";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/Home";
+import About from "./pages/About";
 
 function App() {
   return (
@@ -39,7 +40,7 @@ function App() {
                 path="/about"
                 element={
                   <ProtectedRoute>
-                    <h2>About Page</h2>
+                    <About />
                   </ProtectedRoute>
                 }
               />
