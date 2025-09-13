@@ -12,7 +12,10 @@ function Header() {
 
   const getLinkClasses = (path) => {
     const base = "px-5 py-2 rounded-lg border transition";
-    const active = location.pathname === path ? "border-teal-500 text-teal-500" : "border-transparent text-white hover:text-teal-400";
+    const active =
+      location.pathname === path
+        ? "border-teal-500 text-teal-500"
+        : "border-transparent text-white hover:text-teal-400";
     return `${base} ${active}`;
   };
 
@@ -32,6 +35,12 @@ function Header() {
               </Link>
               <Link to="/todos" className={getLinkClasses("/todos")}>
                 Todos
+              </Link>
+              <Link to="/pending" className={getLinkClasses("/pending")}>
+                Pending Todos
+              </Link>
+              <Link to="/api-todos" className={getLinkClasses("/api-todos")}>
+                API Todos
               </Link>
               <Link to="/about" className={getLinkClasses("/about")}>
                 About

@@ -7,6 +7,9 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import Todos from "./pages/Todos";
+import PendingTodos from "./pages/PendingTodos";
+import ApiTodos from "./pages/ApiTodos";
 
 function App() {
   return (
@@ -32,7 +35,23 @@ function App() {
                 path="/todos"
                 element={
                   <ProtectedRoute>
-                    <h2>Todos Page</h2>
+                    <Todos />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pending"
+                element={
+                  <ProtectedRoute>
+                    <PendingTodos />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/api-todos"
+                element={
+                  <ProtectedRoute>
+                    <ApiTodos />
                   </ProtectedRoute>
                 }
               />

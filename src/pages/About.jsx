@@ -3,7 +3,7 @@ import { FaBullseye, FaClock, FaUserFriends } from "react-icons/fa";
 
 function About() {
   return (
-    <section className="bg-gradient-to-r from-[#f0faff] via-[#e6f2ff] to-[#e0f7fa] text-gray-900 py-32 px-6">
+    <section className="bg-gradient-to-r from-[#f0faff] via-[#e6f2ff] to-[#e0f7fa] text-gray-900 py-33 px-6">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
 
         <div className="text-center md:text-left max-w-lg">
