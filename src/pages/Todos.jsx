@@ -1,90 +1,68 @@
 import React, { useState, useEffect } from "react";
-import { FaPlus, FaTrash, FaCheck, FaEdit, FaSave, FaTimes } from "react-icons/fa";
-import { getDatabase, ref, push, onValue, remove, update } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue,
+  update,
+  remove,
+} from "firebase/database";
 import { useAuth } from "../context/AuthContext";
-import Pagination from "./Pagination";
+import TodoList from "./TodoList";
 
 function Todos() {
   const { currentUser } = useAuth();
   const db = getDatabase();
-  const [tasks, setTasks] = useState([]);
+  const [todos, setTodos] = useState([]);
   const [taskInput, setTaskInput] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [editingTaskId, setEditingTaskId] = useState(null);
-  const [editingText, setEditingText] = useState("");
-  const [editingDueDate, setEditingDueDate] = useState("");
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const tasksPerPage = 5;
 
   useEffect(() => {
     if (!currentUser) return;
     const tasksRef = ref(db, `todos/${currentUser.uid}`);
     onValue(tasksRef, (snapshot) => {
       const data = snapshot.val();
-      const loadedTasks = data
+      const loadedTodos = data
         ? Object.keys(data).map((key) => ({ id: key, ...data[key] }))
         : [];
-      setTasks(loadedTasks);
-      setCurrentPage(1);
+
+      loadedTodos.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+      setTodos(loadedTodos);
     });
   }, [currentUser, db]);
 
   const addTask = () => {
-    if (!taskInput.trim() || !currentUser || !dueDate) return;
+    if (!taskInput.trim() || !dueDate) return;
     const tasksRef = ref(db, `todos/${currentUser.uid}`);
     const currentDate = new Date().toISOString().split("T")[0];
     push(tasksRef, {
       text: taskInput,
       completed: false,
       createdAt: currentDate,
-      dueDate: dueDate,
+      dueDate,
     });
     setTaskInput("");
     setDueDate("");
   };
 
-  const toggleComplete = (id, completed) => {
+  const handleUpdate = (id, updatedFields) => {
     const taskRef = ref(db, `todos/${currentUser.uid}/${id}`);
-    update(taskRef, { completed: !completed });
+    update(taskRef, updatedFields);
   };
 
-  const deleteTask = (id) => {
+  const handleDelete = (id) => {
     const taskRef = ref(db, `todos/${currentUser.uid}/${id}`);
     remove(taskRef);
   };
 
-  const startEditing = (task) => {
-    setEditingTaskId(task.id);
-    setEditingText(task.text);
-    setEditingDueDate(task.dueDate);
-  };
-
-  const cancelEditing = () => {
-    setEditingTaskId(null);
-    setEditingText("");
-    setEditingDueDate("");
-  };
-
-  const saveEdit = (id) => {
-    if (!editingText.trim() || !editingDueDate) return;
-    const taskRef = ref(db, `todos/${currentUser.uid}/${id}`);
-    update(taskRef, { text: editingText, dueDate: editingDueDate });
-    cancelEditing();
-  };
-
-  // Pagination
-  const indexOfLastTask = currentPage * tasksPerPage;
-  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
-  const totalPages = Math.ceil(tasks.length / tasksPerPage);
-
   return (
     <section className="bg-gradient-to-r from-[#e0f7fa] via-[#e6f2ff] to-[#f0faff] text-gray-900 py-20 px-6">
       <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8">
-        <h2 className="text-3xl font-bold text-teal-600 mb-8 text-center">Your Todos</h2>
+        <h2 className="text-3xl font-bold text-teal-600 mb-8 text-center">
+          Your Todos
+        </h2>
 
-        {/* Add Task Section */}
         <div className="flex flex-col md:flex-row gap-3 mb-8">
           <input
             type="text"
@@ -103,103 +81,17 @@ function Todos() {
             onClick={addTask}
             className="bg-teal-500 text-white px-6 py-3 rounded-2xl hover:bg-teal-600 transition flex items-center gap-2 shadow-md"
           >
-            <FaPlus /> Add
+            Add
           </button>
         </div>
 
-        {/* Task List */}
-        <ul className="space-y-4">
-          {currentTasks.length === 0 ? (
-            <p className="text-gray-600 text-center text-lg">No tasks added yet.</p>
-          ) : (
-            currentTasks.map((task) => (
-              <li
-                key={task.id}
-                className={`flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 ${
-                  task.completed ? "bg-green-100 line-through text-gray-500" : "bg-yellow-200"
-                }`}
-              >
-                <div className="flex flex-col md:flex-row gap-4 md:items-center">
-                  {editingTaskId === task.id ? (
-                    <>
-                      <input
-                        type="text"
-                        value={editingText}
-                        onChange={(e) => setEditingText(e.target.value)}
-                        className="p-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-sm"
-                      />
-                      <input
-                        type="date"
-                        value={editingDueDate}
-                        onChange={(e) => setEditingDueDate(e.target.value)}
-                        className="p-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-sm"
-                      />
-                    </>
-                  ) : (
-                    <span className="font-semibold text-lg md:text-xl">{task.text}</span>
-                  )}
-                  <div className="text-sm text-gray-500 mt-1 md:mt-0">
-                    Added: <span className="font-medium">{task.createdAt}</span> | Due:{" "}
-                    <span className="font-medium">{task.dueDate}</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-3 mt-3 md:mt-0">
-                  {editingTaskId === task.id ? (
-                    <>
-                      <button
-                        onClick={() => saveEdit(task.id)}
-                        className="text-blue-500 hover:text-blue-700 transition"
-                        title="Save"
-                      >
-                        <FaSave size={18} />
-                      </button>
-                      <button
-                        onClick={cancelEditing}
-                        className="text-gray-500 hover:text-gray-700 transition"
-                        title="Cancel"
-                      >
-                        <FaTimes size={18} />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => toggleComplete(task.id, task.completed)}
-                        className="text-green-500 hover:text-green-700 transition"
-                        title="Toggle Complete"
-                      >
-                        <FaCheck size={18} />
-                      </button>
-                      <button
-                        onClick={() => startEditing(task)}
-                        className="text-blue-500 hover:text-blue-700 transition"
-                        title="Edit"
-                      >
-                        <FaEdit size={18} />
-                      </button>
-                      <button
-                        onClick={() => deleteTask(task.id)}
-                        className="text-red-500 hover:text-red-700 transition"
-                        title="Delete"
-                      >
-                        <FaTrash size={18} />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </li>
-            ))
-          )}
-        </ul>
-
-        {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-          onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-          color="teal"
+        <TodoList
+          todos={todos}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+          showDueDate={true}
+          cardColor="bg-yellow-100"
+          completedColor="bg-green-100"
         />
       </div>
     </section>
